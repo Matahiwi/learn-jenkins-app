@@ -20,5 +20,20 @@ pipeline {
                 """
             }
         }
+        stage("Test") {
+            agent {
+                docker { 
+                    image 'node:18-alpine'
+                    reuseNode true          // share workspace across agents
+                    }
+            }
+            steps {
+                sh """
+                    ls -la
+                    ls build | grep index.html
+                    npm test
+                """
+            }
+        }
     }
 }
