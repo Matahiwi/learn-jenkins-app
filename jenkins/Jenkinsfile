@@ -48,9 +48,9 @@ pipeline {
             steps {
                 sh """
                     echo "Running E2E Testing Stage"
-                    npm install -g serve # Installserve lets us run the webserver locally
-                    serve -s build       # spin up the webserver using the contents of the build directory
-                    npx playwright test  # this starts the playwright tests
+                    npm install serve                 # Install serve locally into: node_modules/.bin/serve
+                    node_modules/.bin/serve -s build  # spin up the webserver using the contents of the build directory
+                    npx playwright test               # this starts the playwright tests
                 """
             }
         }
