@@ -58,7 +58,7 @@ pipeline {
     }
     post {
         always{
-            junit "test-results/junit.xml" // publish the junit test report
+            junit "jest-results/junit.xml" // publish the junit test report - using output of junit test stanza
         }
     }
 }
