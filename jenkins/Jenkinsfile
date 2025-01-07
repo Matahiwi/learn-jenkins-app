@@ -51,7 +51,7 @@ pipeline {
                     npm install serve                   # Install serve locally into: node_modules/.bin/serve
                     node_modules/.bin/serve -s build &  # spin up webserver in background (TCP/3000) using the contents of the build directory
                     sleep 10                            # wait for webserver to come up
-                    npx playwright test                 # this starts the playwright tests
+                    npx playwright test --reporter=html # this starts the playwright tests (I also added a report generator)
                 """
             }
         }
@@ -59,6 +59,7 @@ pipeline {
     post {
         always{
             junit "jest-results/junit.xml" // publish the junit test report - using output of junit test stanza
+            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright HTML Report', reportTitles: '', useWrapperFileDirectly: true])
         }
     }
 }
