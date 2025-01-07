@@ -31,10 +31,26 @@ pipeline {
             }
             steps {
                 sh """
-                    echo "Running Test Stage"
+                    echo "Running Basic Test Stage"
                     ls -la
                     test -f build/index.html
                     npm test
+                """
+            }
+        }
+        stage("E2E Test") {
+            agent {
+                docker { 
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    reuseNode true          // share workspace across agents
+                    }
+            }
+            steps {
+                sh """
+                    echo "Running E2E Testing Stage"
+                    npm install -g serve # Installserve lets us run the webserver locally
+                    serve -s build       # spin up the webserver using the contents of the build directory
+                    npx playwright test  # this starts the playwright tests
                 """
             }
         }
