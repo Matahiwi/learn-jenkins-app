@@ -48,9 +48,10 @@ pipeline {
             steps {
                 sh """
                     echo "Running E2E Testing Stage"
-                    npm install serve                 # Install serve locally into: node_modules/.bin/serve
-                    node_modules/.bin/serve -s build  # spin up the webserver using the contents of the build directory
-                    npx playwright test               # this starts the playwright tests
+                    npm install serve                   # Install serve locally into: node_modules/.bin/serve
+                    node_modules/.bin/serve -s build &  # spin up webserver in background (TCP/3000) using the contents of the build directory
+                    sleep 10                            # wait for webserver to come up
+                    npx playwright test                 # this starts the playwright tests
                 """
             }
         }
