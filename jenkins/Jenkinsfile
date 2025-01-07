@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -33,6 +34,11 @@ pipeline {
                     ls build | grep index.html
                     npm test
                 """
+            }
+        }
+        stage("CleanWorkspace"){
+            steps{
+                cleanWs() // clean out the workspace at start of pipeline
             }
         }
     }
