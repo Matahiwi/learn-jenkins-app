@@ -40,6 +40,11 @@ pipeline {
                             npm test
                         """
                     }
+                    post {
+                        always{
+                            junit "jest-results/junit.xml" // publish the junit test report - using output of junit test stanza
+                        }
+                    }
                 }
                 stage("E2E Test") {
                     agent {
@@ -59,11 +64,6 @@ pipeline {
                     }
                 }
             }
-        }
-    }
-    post {
-        always{
-            junit "jest-results/junit.xml" // publish the junit test report - using output of junit test stanza
         }
     }
 }
