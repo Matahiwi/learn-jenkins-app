@@ -81,7 +81,7 @@ pipeline {
                 sh """
                     echo "Running Deployment Stage"
                     npm install netlify-cli
-                    node_modules/.bin/netflify status
+                    node_modules/.bin/netlify status
 
                 """
             }
