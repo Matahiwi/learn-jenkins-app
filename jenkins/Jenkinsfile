@@ -79,7 +79,7 @@ pipeline {
             }
             steps {
                 sh """
-                    echo "Running Deployment Stage"
+                    echo "Running The Deployment Stage"
                     npm install netlify-cli
                     # next get status (shows credentials are working)
                     node_modules/.bin/netlify status
