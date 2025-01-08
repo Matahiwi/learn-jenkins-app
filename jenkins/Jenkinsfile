@@ -76,7 +76,7 @@ pipeline {
             }
         }
 
-        stage("Deploy") {
+        stage("Deploy Staging") {
             agent {
                 docker { 
                     image 'node:18-alpine'
@@ -85,7 +85,26 @@ pipeline {
             }
             steps {
                 sh """
-                    echo "Running Deployment Stage"
+                    echo "Deploying to Staging"
+                    npm install netlify-cli
+                    # next get status (shows credentials are working)
+                    node_modules/.bin/netlify status
+                    # next deploy from our dir called build with all the compiled bits into production
+                    node_modules/.bin/netlify deploy --dir=build   // without prod flag it deploys to stage
+                """
+            }
+        }
+
+        stage("Deploy Production") {
+            agent {
+                docker { 
+                    image 'node:18-alpine'
+                    reuseNode true          // share workspace across agents
+                    }
+            }
+            steps {
+                sh """
+                    echo "Running Deploying to Production"
                     npm install netlify-cli
                     # next get status (shows credentials are working)
                     node_modules/.bin/netlify status
