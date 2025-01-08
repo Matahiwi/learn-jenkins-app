@@ -50,6 +50,7 @@ pipeline {
                         }
                     }
                 }
+
                 stage("E2E Test") {
                     agent {
                         docker { 
@@ -57,14 +58,19 @@ pipeline {
                             reuseNode true          // share workspace across agents
                             }
                     }
-                    steps {
+                    steps { // local end to end test of app during build
                         sh """
                             echo "Running E2E Testing Stage"
-                            npm install serve                   # Install serve locally into: node_modules/.bin/serve
-                            node_modules/.bin/serve -s build &  # spin up webserver in background (TCP/3000) using the contents of the build directory
-                            sleep 10                            # wait for webserver to come up
-                            npx playwright test                 # this starts the playwright tests 
+                            npm install serve                    # Install serve locally into: node_modules/.bin/serve
+                            node_modules/.bin/serve -s build &   # spin up webserver in background (TCP/3000) using the contents of the build directory
+                            sleep 10                             # wait for webserver to come up
+                            npx playwright test --reporter=html  # this starts the playwright tests 
                         """
+                    }
+                    post {
+                        always{ // publish to an html report
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright Local', reportTitles: '', useWrapperFileDirectly: true])
+                        }
                     }
                 }
             }
@@ -79,7 +85,7 @@ pipeline {
             }
             steps {
                 sh """
-                    echo "Running The Deployment Stage"
+                    echo "Running Deployment Stage"
                     npm install netlify-cli
                     # next get status (shows credentials are working)
                     node_modules/.bin/netlify status
@@ -88,5 +94,37 @@ pipeline {
                 """
             }
         }
+
+        stage("Prod E2E Test") {
+            agent {       // Here we actually test the final deploued website
+                docker { 
+                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    reuseNode true          // share workspace across agents
+                    }
+            }
+
+            environment{
+                // Playwright testing configuration:
+                // The configuration for the playwright testing package is in: playwright.config.js
+                // The url to test is in the environment variable: CI_ENVIRONMENT_URL (if not set it defaults to: localhost:3000)
+                CI_ENVIRONMENT_URL = "https://elaborate-hummingbird-40303c.netlify.app"
+            }
+
+            steps { //  end to end test of deployed app
+                sh """
+                    echo "Running E2E Test against the prod deploy"
+                    npx playwright test --reporter=html        # this starts the playwright tests 
+                """
+            }
+            post {
+                always{ // publish to an html report
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright E2E', reportTitles: '', useWrapperFileDirectly: true])
+                }
+            }
+        }
     }
 }
+
+
+
+
