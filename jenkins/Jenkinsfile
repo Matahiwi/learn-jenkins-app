@@ -77,7 +77,7 @@ pipeline {
                 sh """
                     echo "Running Deployment Stage"
                     npm install netlify-cli --save-dev
-                    node_modules/.bin/netflify --version
+                    node_modules/.bin/netlify --version
                 """
             }
         }
