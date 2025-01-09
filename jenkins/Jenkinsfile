@@ -6,7 +6,15 @@ pipeline {
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')         // use credential_id as argument
     }
 
-    stages {       
+    stages {    
+        stage("Docker"){
+            steps{
+                sh """
+                    docker build -t my-playwright .
+                """
+            }
+        }
+
         stage("Build") {
             agent {
                 docker { 
@@ -146,4 +154,6 @@ pipeline {
         }
     }
 }
+
+
 
